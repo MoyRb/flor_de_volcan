@@ -1,26 +1,183 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-fdv-cream: #f7f2e9;
+  --color-fdv-card: #fffaf3;
+  --color-fdv-linen: #f3e8dc;
+  --color-fdv-burgundy: #4e1f2f;
+  --color-fdv-wine: #6f2a3e;
+  --color-fdv-clay: #b66145;
+  --color-fdv-olive: #6d7d45;
+  --color-fdv-amber: #b7822d;
+  --color-fdv-error: #9e3a34;
+  --color-fdv-ink: #2f2925;
+  --color-fdv-muted: #75695f;
+  --color-fdv-border: #e1d2c1;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+  --font-brand: "Playfair Display", "Times New Roman", serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-fdv-cream);
+  color: var(--color-fdv-ink);
+  font-family: var(--font-sans);
+}
+
+.font-brand {
+  font-family: var(--font-brand);
+}
+
+.fdv-sidebar {
+  background: linear-gradient(180deg, #4e1f2f 0%, #3f1724 55%, #38131f 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fdv-panel {
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklab, var(--color-fdv-border) 85%, white);
+  background: color-mix(in oklab, var(--color-fdv-card) 90%, white);
+  box-shadow: 0 10px 24px rgba(97, 51, 35, 0.07);
+}
+
+.fdv-btn-primary,
+.fdv-btn-secondary {
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.95rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: 180ms ease;
+}
+
+.fdv-btn-primary {
+  background: var(--color-fdv-clay);
+  color: #fffaf7;
+}
+
+.fdv-btn-primary:hover {
+  background: color-mix(in oklab, var(--color-fdv-clay) 85%, black);
+}
+
+.fdv-btn-secondary {
+  border: 1px solid var(--color-fdv-border);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.fdv-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.fdv-tabs {
+  display: flex;
+  gap: 0.3rem;
+  border-radius: 0.7rem;
+  background: #f0e3d4;
+  padding: 0.25rem;
+}
+
+.fdv-tab,
+.fdv-tab-active {
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+.fdv-tab-active {
+  background: var(--color-fdv-wine);
+  color: white;
+}
+
+.fdv-tab {
+  color: var(--color-fdv-muted);
+}
+
+.fdv-widget {
+  border-radius: 0.85rem;
+  border: 1px solid var(--color-fdv-border);
+  background: #fff;
+  padding: 0.9rem;
+}
+
+.fdv-input {
+  border-radius: 0.65rem;
+  border: 1px solid var(--color-fdv-border);
+  background: #fff;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.fdv-input:focus {
+  outline: 2px solid color-mix(in oklab, var(--color-fdv-clay) 45%, white);
+  outline-offset: 0;
+}
+
+.fdv-badge {
+  border-radius: 999px;
+  padding: 0.22rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fdv-badge-ok {
+  background: #e9f0db;
+  color: #5a6837;
+}
+
+.fdv-badge-warn {
+  background: #f5e8d3;
+  color: #9a6818;
+}
+
+.fdv-badge-soft {
+  background: #ece6df;
+  color: #63584f;
+}
+
+.fdv-bar {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--color-fdv-muted);
+}
+
+.fdv-bar > span {
+  display: block;
+  height: 0.42rem;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #9f4f39, #cd8e6a);
+}
+
+.fdv-stat {
+  border-radius: 0.7rem;
+  border: 1px solid var(--color-fdv-border);
+  background: #fff;
+  padding: 0.6rem;
+}
+
+.fdv-stat span {
+  display: block;
+  font-size: 0.73rem;
+  color: var(--color-fdv-muted);
+}
+
+.fdv-stat strong {
+  margin-top: 0.2rem;
+  display: block;
+  font-size: 0.95rem;
+}
+
+.fdv-watermark {
+  position: absolute;
+  right: 1.2rem;
+  top: 1rem;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 40%, rgba(182, 97, 69, 0.12), transparent 58%),
+    radial-gradient(circle at 68% 54%, rgba(78, 31, 47, 0.1), transparent 62%);
+  filter: blur(1px);
+  pointer-events: none;
 }
