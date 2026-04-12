@@ -18,7 +18,7 @@ export async function upsertTipoVino(prevState: ActionState = initialActionState
   const supabase = await createClient();
   const { error } = id
     ? await supabase.from('finished_products').update(payload).eq('id', id)
-    : await supabase.from('finished_products').insert({ ...payload, base_unit_id: String(formData.get('base_unit_id') ?? ''), unit_cost: 0, sale_price: 0, current_stock: 0 });
+    : await supabase.from('finished_products').insert(payload);
   if (error) return { success: false, message: error.message };
   revalidatePath('/catalogo/tipos-vino');
   revalidatePath('/producto-terminado');

@@ -13,8 +13,9 @@ export default async function MateriaPrimaPage() {
     supabase.from('cat_units').select('id, code, name').order('name'),
     supabase.from('suppliers').select('id, supplier_code, name').eq('is_active', true).order('name'),
     supabase.from('wine_lots').select('id, lot_code').order('lot_code'),
-    supabase.from('raw_material_stock_movements').select('id, movement_type, quantity, movement_date, reference, raw_materials(name)').order('movement_date', { ascending: false }).limit(20),
+    supabase.from('raw_material_stock_movements').select('id, raw_material_id, movement_type, quantity, movement_date, reference').order('movement_date', { ascending: false }).limit(20),
   ]);
+  const materialNameById = new Map((materials ?? []).map((item) => [item.id, item.name]));
 
   return (
     <section className="fdv-panel p-5">
@@ -33,7 +34,7 @@ export default async function MateriaPrimaPage() {
           <div className="space-y-2 text-xs">
             {movements?.map((row) => (
               <div key={row.id} className="rounded border border-fdv-border p-2">
-                <p className="font-medium">{row.raw_materials?.name ?? 'Material'}</p>
+                <p className="font-medium">{materialNameById.get(row.raw_material_id) ?? 'Material'}</p>
                 <p>{row.movement_type} · {row.quantity}</p>
                 <p className="text-fdv-muted">{new Date(row.movement_date).toLocaleString('es-MX')} {row.reference ? `· ${row.reference}` : ''}</p>
               </div>
