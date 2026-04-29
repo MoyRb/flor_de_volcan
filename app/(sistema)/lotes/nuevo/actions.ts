@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { createClient } from '@/src/lib/supabase/server';
 
 import { initialLotActionState, type LotActionState } from './state';
+import { getCanonicalStageCodeFromOperationalState } from '@/src/lib/domain/lot-operational-state';
 
 const lotSchema = z.object({
   lot_code: z.string().trim().min(1, 'El código de lote es obligatorio.'),
@@ -69,10 +70,17 @@ export async function createLot(prevState: LotActionState = initialLotActionStat
   const inoculoDosisGl = inoculoDosisGlRaw ? Number(inoculoDosisGlRaw) : null;
   const relacionMateriaPrimaGl = relacionMateriaPrimaGlRaw ? Number(relacionMateriaPrimaGlRaw) : null;
 
+  const canonicalStageCode = getCanonicalStageCodeFromOperationalState(estadoLote);
+  console.log('[createLot] operational->canonical mapping:', { estadoLote, canonicalStageCode });
+
+  if (!canonicalStageCode) {
+    return { success: false, message: 'Estado del lote inválido para el mapeo operativo.' };
+  }
+
   const [{ data: status, error: statusError }, { data: fallbackProduct, error: productError }, { data: stage, error: stageError }, { data: tank, error: tankError }] = await Promise.all([
     supabase.from('cat_lot_status').select('id').order('is_closed').limit(1).maybeSingle(),
     supabase.from('finished_products').select('id').limit(1).maybeSingle(),
-    supabase.from('cat_vinification_stages').select('id').eq('name', estadoLote).maybeSingle(),
+    supabase.from('cat_vinification_stages').select('id, code').eq('code', canonicalStageCode).maybeSingle(),
     (supabase as any).from('capacity_tanks').select('id').eq('name', sistemaFermentacion).maybeSingle(),
   ]);
 
@@ -80,9 +88,9 @@ export async function createLot(prevState: LotActionState = initialLotActionStat
     console.error('[createLot] reference query errors:', { statusError, productError, stageError, tankError });
     return { success: false, message: 'No se pudieron cargar catálogos para crear el lote.' };
   }
-  if (!status?.id || !fallbackProduct?.id || !stage?.id) {
-    console.error('[createLot] missing reference ids:', { status, fallbackProduct, stage });
-    return { success: false, message: 'Faltan catálogos requeridos (estado, producto o etapa).' };
+  if (!status?.id || !stage?.id) {
+    console.error('[createLot] missing required reference ids:', { status, stage, fallbackProduct });
+    return { success: false, message: 'Faltan catálogos requeridos (estado o etapa canónica).' };
   }
 
   const metadata = {
@@ -108,10 +116,12 @@ export async function createLot(prevState: LotActionState = initialLotActionStat
     current_volume_liters: target_volume_liters,
     current_stage_id: stage.id,
     lot_status_id: status.id,
-    finished_product_id: fallbackProduct.id,
+    ...(fallbackProduct?.id ? { finished_product_id: fallbackProduct.id } : {}),
+    operational_state: estadoLote,
     notes: JSON.stringify(metadata),
   };
   console.log('[createLot] final lot payload:', lotPayload);
+  console.log('[createLot] fallbackProduct resolution:', { fallbackProduct, productError });
 
   const { data: lot, error: lotInsertError } = await supabase.from('wine_lots').insert(lotPayload).select('id').maybeSingle();
   console.log('[createLot] insert wine_lots response:', { lot, lotInsertError });
