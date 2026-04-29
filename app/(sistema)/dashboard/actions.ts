@@ -20,6 +20,7 @@ export async function registerMeasurement(formData: FormData) {
   const note = String(formData.get('note') ?? '').trim();
 
   if (!lotId || !readingAt) return;
+  if (brix === null && ph === null && temperature === null) return;
 
   const metricDate = readingAt.slice(0, 10);
 
@@ -53,6 +54,7 @@ export async function registerMeasurement(formData: FormData) {
   }
 
   revalidatePath('/dashboard');
+  revalidatePath('/mediciones');
   revalidatePath('/lotes');
   revalidatePath('/reportes');
 }
