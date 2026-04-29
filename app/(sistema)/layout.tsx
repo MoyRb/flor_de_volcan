@@ -8,7 +8,7 @@ export default function SistemaLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="grid min-h-screen bg-[#faf7f2] lg:grid-cols-[280px_1fr]">
+    <div className="grid min-h-screen bg-fdv-cream lg:grid-cols-[280px_1fr]">
       <Sidebar />
       <main className="p-6 lg:p-8">{children}</main>
     </div>
