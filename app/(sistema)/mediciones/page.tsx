@@ -29,13 +29,13 @@ export default async function RegistroMedicionesPage({ searchParams }: { searchP
           .from('lot_daily_metrics')
           .select('metric_date, brix, ph, temperature_c')
           .eq('lot_id', selectedLot)
-          .order('metric_date', { ascending: false })
+          .order('metric_date', { ascending: true })
           .limit(12),
         (supabase as any)
           .from('bitacora_entries')
           .select('entry_date, entry_type, details')
           .eq('lot_id', selectedLot)
-          .order('entry_date', { ascending: false })
+          .order('entry_date', { ascending: true })
           .limit(12),
       ])
     : [{ data: [] }, { data: [] }];
@@ -87,14 +87,14 @@ export default async function RegistroMedicionesPage({ searchParams }: { searchP
 
     <div className="grid gap-4 lg:grid-cols-2">
       <article className="fdv-panel p-5">
-        <h2 className="font-semibold">Últimas mediciones</h2>
+        <h2 className="font-semibold">Últimas mediciones reales</h2>
         <ul className="mt-2 space-y-1 text-sm">
-          {metricas.map((m) => <li key={m.metric_date}>{m.metric_date}: Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C</li>)}
+          {metricas.slice(-12).reverse().map((m) => <li key={m.metric_date}>{new Date(m.metric_date).toLocaleDateString('es-MX')}: Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C</li>)}
           {metricas.length === 0 && <li className="text-fdv-muted">Sin mediciones registradas.</li>}
         </ul>
       </article>
       <article className="fdv-panel p-5">
-        <h2 className="font-semibold">Seguimiento del lote (bitácora)</h2>
+        <h2 className="font-semibold">Seguimiento del lote (orden cronológico)</h2>
         <ul className="mt-2 space-y-1 text-sm">
           {eventos.map((e) => <li key={`${e.entry_date}-${e.details}`}>{e.entry_date} · [{e.entry_type}] {e.details}</li>)}
           {eventos.length === 0 && <li className="text-fdv-muted">Sin eventos registrados.</li>}

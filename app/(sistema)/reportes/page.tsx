@@ -4,8 +4,8 @@ import { createClient } from '@/src/lib/supabase/server';
 export default async function ReportesPage({ searchParams }: { searchParams: Promise<{ lot?: string; from?: string; to?: string }> }) {
   const supabase = await createClient();
   const params = await searchParams;
-  const { data: lots } = await (supabase as any).from('wine_lots').select('id, lot_code, start_date, current_volume_liters, cat_vinification_stages(name)').order('start_date', { ascending: false });
-  const lotsList = (lots ?? []) as Array<{ id: string; lot_code: string }>;
+  const { data: lots } = await (supabase as any).from('wine_lots').select('id, lot_code, start_date, current_volume_liters, notes, cat_vinification_stages(name), cat_lot_status(name)').order('start_date', { ascending: false });
+  const lotsList = (lots ?? []) as Array<{ id: string; lot_code: string; notes?: string | null; cat_lot_status?: { name?: string } | null }>;
   const selectedLot = params.lot ?? lotsList[0]?.id;
 
   const metricsQ = (supabase as any).from('lot_daily_metrics').select('metric_date, brix, ph, temperature_c').eq('lot_id', selectedLot ?? '').order('metric_date', { ascending: false });
@@ -33,9 +33,9 @@ export default async function ReportesPage({ searchParams }: { searchParams: Pro
       <button className="fdv-btn-primary">Filtrar</button>
     </form>
     <article className="fdv-panel p-4">
-      <h2 className="font-semibold">Historial de mediciones</h2>
+      <h2 className="font-semibold">Historial de mediciones reales</h2>
       <ul className="text-sm">{metricsList.map((m) => <li key={m.metric_date}>{m.metric_date}: Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C</li>)}</ul>
-      <h2 className="mt-4 font-semibold">Historial de eventos</h2>
+      <h2 className="mt-4 font-semibold">Seguimiento del lote (orden cronológico)</h2>
       <ul className="text-sm">{eventsList.map((e) => <li key={`${e.entry_date}-${e.details}`}>{new Date(e.entry_date).toLocaleString('es-MX')} [{e.entry_type}] {e.details}</li>)}</ul>
     </article>
   </section>;
