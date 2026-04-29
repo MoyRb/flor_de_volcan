@@ -1,120 +1,83 @@
-import Image from "next/image";
-import { createClient } from "@/src/lib/supabase/server";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createClient } from '@/src/lib/supabase/server';
+import { registerEvent, registerMeasurement } from './actions';
 
 function formatDate(value?: string) {
-  if (!value) return "N/A";
-  return new Date(`${value}T00:00:00Z`).toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+  if (!value) return 'N/A';
+  return new Date(value).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+}
+
+function getLotMeta(notes: string | null) {
+  if (!notes) return null;
+  try { return JSON.parse(notes) as { fruit_name?: string; yeast?: string; target_brix?: number; target_ph?: number }; } catch { return null; }
 }
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: lot } = await supabase
-    .from("wine_lots")
-    .select("id, lot_code, start_date, current_volume_liters")
-    .order("start_date", { ascending: false })
+  const { data: lot } = await (supabase as any)
+    .from('wine_lots')
+    .select('id, lot_code, start_date, current_volume_liters, notes, cat_vinification_stages(name), cat_lot_status(name)')
+    .order('start_date', { ascending: false })
     .limit(1)
     .maybeSingle();
 
   const lotId = lot?.id;
   const [metricsRes, eventsRes] = lotId
     ? await Promise.all([
-        supabase
-          .from("lot_daily_metrics")
-          .select("metric_date, temperature_c, ph, brix")
-          .eq("lot_id", lotId)
-          .order("metric_date", { ascending: true })
-          .limit(12),
-        supabase
-          .from("lot_stage_history")
-          .select("started_at, comments")
-          .eq("lot_id", lotId)
-          .order("started_at", { ascending: false })
-          .limit(5),
+        (supabase as any).from('lot_daily_metrics').select('metric_date, temperature_c, ph, brix').eq('lot_id', lotId).order('metric_date'),
+        (supabase as any).from('bitacora_entries').select('entry_date, entry_type, details').eq('lot_id', lotId).order('entry_date', { ascending: false }).limit(8),
       ])
     : [{ data: [] }, { data: [] }];
 
-  const metrics = metricsRes.data ?? [];
+  const metrics: Array<{ metric_date: string; temperature_c: number | null; ph: number | null; brix: number | null }> = (metricsRes.data ?? []) as any[];
   const latest = metrics.at(-1);
-  const dayCount = metrics.length || "-";
+  const processDay = metrics.length > 0 ? metrics.length : '-';
+  const meta = getLotMeta(lot?.notes ?? null);
 
-  return (
-    <section className="space-y-5">
-      <header className="fdv-panel overflow-hidden">
-        <div className="border-b border-fdv-line px-6 py-5 text-center">
-          <div className="mx-auto flex max-w-[420px] items-center justify-center rounded-2xl bg-white px-4 py-3">
-            <Image
-              src="/branding/logo-flor-del-volcan.png"
-              alt="Flor del Volcán"
-              width={420}
-              height={140}
-              priority
-              className="h-auto max-h-28 w-auto max-w-full object-contain"
-            />
-          </div>
-          <p className="mt-2 text-xs tracking-[0.32em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-2 px-6 py-4">
-          <div>
-            <p className="text-3xl font-semibold text-fdv-heading">Lote Actual — {lot?.lot_code ?? "Sin lote activo"}</p>
-            <p className="mt-1 text-fdv-muted">Día {dayCount} · {lot?.current_volume_liters ?? 0} litros · Última medición: {formatDate(latest?.metric_date)}</p>
-          </div>
-          <span className="fdv-badge fdv-badge-ok">Fermentando</span>
-        </div>
-      </header>
+  return <section className="space-y-4">
+    <header className="fdv-panel p-5">
+      <h1 className="text-2xl font-semibold text-fdv-heading">Lote activo: {lot?.lot_code ?? 'Sin lote'}</h1>
+      <p className="text-sm text-fdv-muted">Día {processDay} · {lot?.current_volume_liters ?? 0} L · Última medición {formatDate(latest?.metric_date)}</p>
+      <p className="text-sm text-fdv-muted">Fruta: {meta?.fruit_name ?? 'No definida'} · Levadura: {meta?.yeast ?? 'N/A'} · Objetivo Brix/pH: {meta?.target_brix ?? '-'} / {meta?.target_ph ?? '-'}</p>
+      <p className="text-sm text-fdv-muted">Estado: {(lot?.cat_lot_status as { name?: string } | null)?.name ?? 'N/A'} · Etapa: {(lot?.cat_vinification_stages as { name?: string } | null)?.name ?? 'N/A'}</p>
+    </header>
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_280px]">
-        <article className="fdv-panel p-5">
-          <h2 className="mb-3 text-3xl font-semibold text-fdv-heading">Brix vs Días</h2>
-          <div className="rounded-2xl border border-fdv-line bg-[#fffcfa] p-4">
-            <svg viewBox="0 0 100 36" className="h-64 w-full" preserveAspectRatio="none">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <line key={i} x1="0" y1={i * 7.2} x2="100" y2={i * 7.2} stroke="#ece4da" strokeWidth="0.35" />
-              ))}
-              {metrics.length > 1 && (
-                <polyline
-                  fill="none"
-                  stroke="#b86e5a"
-                  strokeWidth="0.8"
-                  points={metrics.map((m, i) => `${(i / (metrics.length - 1)) * 100},${34 - Number(m.brix ?? 0)}`).join(" ")}
-                />
-              )}
-              {metrics.length > 1 && (
-                <polyline
-                  fill="none"
-                  stroke="#9daf90"
-                  strokeWidth="0.7"
-                  points={metrics.map((m, i) => `${(i / (metrics.length - 1)) * 100},${34 - Number(m.temperature_c ?? 0)}`).join(" ")}
-                />
-              )}
-            </svg>
-          </div>
-        </article>
-
-        <aside className="fdv-panel divide-y divide-fdv-line overflow-hidden p-0">
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="fdv-badge fdv-badge-ok">Fermentando</span>
-            <span className="text-sm text-fdv-muted">{new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}</span>
-          </div>
-          <div className="p-4"><p className="text-sm text-fdv-muted">Temperatura</p><p className="text-4xl text-fdv-heading">{latest?.temperature_c ?? "-"} °C</p></div>
-          <div className="p-4"><p className="text-sm text-fdv-muted">pH</p><p className="text-4xl text-fdv-heading">{latest?.ph ?? "-"}</p></div>
-          <div className="p-4"><p className="text-sm text-fdv-muted">°Brix</p><p className="text-4xl text-fdv-heading">{latest?.brix ?? "-"}</p></div>
-        </aside>
+    <article className="fdv-panel p-5">
+      <h2 className="text-lg font-semibold">Brix vs días</h2>
+      <svg viewBox="0 0 100 36" className="h-52 w-full rounded-lg bg-[#fffcfa]" preserveAspectRatio="none">
+        {metrics.length > 1 && <polyline fill="none" stroke="#b86e5a" strokeWidth="0.8" points={metrics.map((m, i) => `${(i / (metrics.length - 1)) * 100},${34 - Number(m.brix ?? 0)}`).join(' ')} />}
+      </svg>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
+        <div className="rounded border p-2">Temp: {latest?.temperature_c ?? '-'} °C</div>
+        <div className="rounded border p-2">pH: {latest?.ph ?? '-'}</div>
+        <div className="rounded border p-2">Brix: {latest?.brix ?? '-'}</div>
       </div>
+    </article>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <article className="fdv-panel p-5">
-          <h3 className="mb-2 text-3xl font-semibold text-fdv-heading">Últimas Mediciones</h3>
-          <table className="w-full text-sm">
-            <thead className="text-left text-fdv-muted"><tr><th>Día</th><th>Temp</th><th>pH</th><th>°Brix</th></tr></thead>
-            <tbody>{metrics.slice(-5).reverse().map((m) => <tr key={m.metric_date} className="border-t border-fdv-line"><td className="py-2">{formatDate(m.metric_date)}</td><td>{m.temperature_c ?? "-"}°C</td><td>{m.ph ?? "-"}</td><td>{m.brix ?? "-"}</td></tr>)}</tbody>
-          </table>
-        </article>
-        <article className="fdv-panel p-5">
-          <h3 className="mb-2 text-3xl font-semibold text-fdv-heading">Línea de Eventos</h3>
-          <ul className="space-y-2 text-sm text-fdv-muted">{(eventsRes.data ?? []).map((e) => <li key={`${e.started_at}-${e.comments ?? ""}`} className="rounded-lg border border-fdv-line bg-[#fffdfb] px-3 py-2">{new Date(e.started_at).toLocaleDateString("es-MX")}: {e.comments ?? "Cambio de etapa"}</li>)}</ul>
-          <div className="mt-4 flex gap-2"><button className="fdv-btn-primary">Nueva Medición</button><button className="fdv-btn-secondary">Registrar Evento</button></div>
-        </article>
-      </div>
-    </section>
-  );
+    <div className="grid gap-4 lg:grid-cols-2">
+      <article className="fdv-panel p-5">
+        <h3 className="font-semibold">Últimas mediciones</h3>
+        <ul className="mt-2 space-y-1 text-sm">{metrics.slice(-6).reverse().map((m) => <li key={m.metric_date}>{formatDate(m.metric_date)} · Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C</li>)}</ul>
+        {lotId && <form action={registerMeasurement} className="mt-4 grid gap-2">
+          <input type="hidden" name="lot_id" value={lotId} />
+          <input type="datetime-local" name="reading_at" required className="fdv-input" />
+          <div className="grid grid-cols-3 gap-2"><input name="brix" type="number" step="0.01" placeholder="Brix" className="fdv-input" /><input name="ph" type="number" step="0.01" placeholder="pH" className="fdv-input" /><input name="temperature_c" type="number" step="0.1" placeholder="°C" className="fdv-input" /></div>
+          <input name="note" placeholder="Nota" className="fdv-input" />
+          <button className="fdv-btn-primary">Nueva medición</button>
+        </form>}
+      </article>
+
+      <article className="fdv-panel p-5">
+        <h3 className="font-semibold">Línea de eventos</h3>
+        <ul className="mt-2 space-y-1 text-sm">{((eventsRes.data ?? []) as Array<{ entry_date: string; entry_type: string; details: string }>).map((e) => <li key={`${e.entry_date}-${e.details}`}>{formatDate(e.entry_date)} · [{e.entry_type}] {e.details}</li>)}</ul>
+        {lotId && <form action={registerEvent} className="mt-4 grid gap-2">
+          <input type="hidden" name="lot_id" value={lotId} />
+          <select name="event_type" className="fdv-input"><option value="inoculacion">Inoculación</option><option value="medicion">Medición</option><option value="trasiego">Trasiego</option><option value="ajuste_ph">Ajuste pH</option><option value="cambio_recipiente">Cambio de recipiente</option><option value="estabilizacion">Estabilización</option><option value="embotellado">Embotellado</option><option value="observacion">Observación</option></select>
+          <input type="datetime-local" name="event_date" className="fdv-input" />
+          <input name="details" required placeholder="Detalle del evento" className="fdv-input" />
+          <button className="fdv-btn-secondary">Registrar evento</button>
+        </form>}
+      </article>
+    </div>
+  </section>;
 }
