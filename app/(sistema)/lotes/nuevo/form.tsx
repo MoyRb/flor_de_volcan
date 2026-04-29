@@ -2,7 +2,8 @@
 
 import { useActionState } from 'react';
 import { SubmitButton } from '@/components/submit-button';
-import { createLot, initialLotActionState } from './actions';
+import { createLot } from './actions';
+import { initialLotActionState } from './state';
 
 type Props = {
   protocolos: string[];

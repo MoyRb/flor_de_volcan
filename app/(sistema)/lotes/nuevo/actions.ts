@@ -6,13 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/src/lib/supabase/server';
 
-type LotActionState = {
-  success: boolean;
-  message: string;
-  errors?: Record<string, string[]>;
-};
-
-export const initialLotActionState: LotActionState = { success: false, message: '' };
+import { initialLotActionState, type LotActionState } from './state';
 
 const lotSchema = z.object({
   lot_code: z.string().trim().min(1, 'El código de lote es obligatorio.'),
