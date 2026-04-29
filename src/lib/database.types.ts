@@ -243,7 +243,7 @@ export type Database = {
         {
           id: string;
           lot_code: string;
-          finished_product_id: string;
+          finished_product_id: string | null;
           lot_status_id: string;
           current_stage_id: string;
           start_date: string;
@@ -251,6 +251,7 @@ export type Database = {
           actual_end_date: string | null;
           target_volume_liters: number;
           current_volume_liters: number;
+          operational_state: string | null;
           notes: string | null;
           created_at: string;
           updated_at: string;
@@ -258,7 +259,7 @@ export type Database = {
         {
           id?: string;
           lot_code: string;
-          finished_product_id: string;
+          finished_product_id?: string | null;
           lot_status_id: string;
           current_stage_id: string;
           start_date: string;
@@ -266,12 +267,13 @@ export type Database = {
           actual_end_date?: string | null;
           target_volume_liters: number;
           current_volume_liters?: number;
+          operational_state?: string | null;
           notes?: string | null;
         },
         {
           id?: string;
           lot_code?: string;
-          finished_product_id?: string;
+          finished_product_id?: string | null;
           lot_status_id?: string;
           current_stage_id?: string;
           start_date?: string;
@@ -279,6 +281,7 @@ export type Database = {
           actual_end_date?: string | null;
           target_volume_liters?: number;
           current_volume_liters?: number;
+          operational_state?: string | null;
           notes?: string | null;
         }
       >;
