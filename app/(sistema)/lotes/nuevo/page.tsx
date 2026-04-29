@@ -1,10 +1,11 @@
+import { LOT_OPERATIONAL_STATES } from '@/src/lib/domain/lot-operational-state';
 import { NuevoLoteForm } from './form';
 
 export default async function NuevoLotePage() {
   const protocolos = ['Vinificación', 'Fermentación corta', 'Maceración', 'Infusión alcohólica', 'Carbonatación'];
   const sistemasFermentacion = ['PET 5L', 'PET 10L', 'Garrafón 20L', 'Vidrio', 'Acero inoxidable'];
   const materiasPrimasBase = ['Jamaica', 'Mango', 'Guanábana', 'Maracuyá', 'Café', 'Mixto'];
-  const estadosLote = ['Preparación de mosto', 'Inoculación', 'Fermentación activa', 'Fermentación lenta', 'Post-fermentación', 'Ajuste de perfil', 'Estabilización', 'Envasado', 'Listo para venta'];
+  const estadosLote = [...LOT_OPERATIONAL_STATES];
   const condicionesTransicion = ['Brix < 10°', 'pH estable', 'Ausencia de burbujeo'];
   const criteriosTransicion = ['Brix < 10', 'pH estable ±0.1', 'Día ≥ 7', 'Sin burbujeo visible'];
 

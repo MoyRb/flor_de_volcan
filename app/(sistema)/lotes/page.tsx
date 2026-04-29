@@ -11,13 +11,13 @@ export default async function LotesPage() {
   const [{ data: lots }, { data: tanks }] = await Promise.all([
     (supabase as any)
       .from('wine_lots')
-      .select('id, lot_code, start_date, current_volume_liters, notes, cat_vinification_stages(name), lot_daily_metrics(metric_date,brix)')
+      .select('id, lot_code, start_date, current_volume_liters, operational_state, notes, cat_vinification_stages(name), lot_daily_metrics(metric_date,brix)')
       .order('start_date', { ascending: false }),
     (supabase as any).from('capacity_tanks').select('current_lot_id,name'),
   ]);
 
   const tanksList = (tanks ?? []) as Array<{ current_lot_id: string | null; name: string }>;
-  const lotsList = (lots ?? []) as Array<{ id: string; lot_code: string; start_date: string; notes: string | null; cat_vinification_stages?: { name?: string } | null; lot_daily_metrics?: { metric_date: string; brix: number | null }[] }>;
+  const lotsList = (lots ?? []) as Array<{ id: string; lot_code: string; start_date: string; operational_state?: string | null; notes: string | null; cat_vinification_stages?: { name?: string } | null; lot_daily_metrics?: { metric_date: string; brix: number | null }[] }>;
   const tankByLot = new Map(tanksList.filter((t) => t.current_lot_id).map((t) => [t.current_lot_id as string, t.name]));
 
   return (
@@ -28,7 +28,7 @@ export default async function LotesPage() {
           const readings = (lot.lot_daily_metrics ?? []);
           const last = readings.sort((a, b) => b.metric_date.localeCompare(a.metric_date))[0];
           const meta = lotMetaFromNotes(lot.notes);
-          return <tr key={lot.id} className="border-t"><td>{lot.lot_code}</td><td>{meta?.fruit_name ?? '-'}</td><td>{meta?.estado_lote ?? (lot.cat_vinification_stages as { name?: string } | null)?.name ?? '-'}</td><td>{lot.start_date}</td><td>{last ? `${last.metric_date} (Brix ${last.brix ?? '-'})` : '-'}</td><td>{meta?.sistema_fermentacion ?? tankByLot.get(lot.id) ?? '-'}</td><td><Link href={`/reportes?lot=${lot.id}`} className="fdv-btn-secondary">Abrir detalle</Link></td></tr>;
+          return <tr key={lot.id} className="border-t"><td>{lot.lot_code}</td><td>{meta?.fruit_name ?? '-'}</td><td>{lot.operational_state ?? meta?.estado_lote ?? (lot.cat_vinification_stages as { name?: string } | null)?.name ?? '-'}</td><td>{lot.start_date}</td><td>{last ? `${last.metric_date} (Brix ${last.brix ?? '-'})` : '-'}</td><td>{meta?.sistema_fermentacion ?? tankByLot.get(lot.id) ?? '-'}</td><td><Link href={`/reportes?lot=${lot.id}`} className="fdv-btn-secondary">Abrir detalle</Link></td></tr>;
         })}
       </tbody></table>
     </section>

@@ -177,7 +177,7 @@ create table if not exists process_parameters (
 create table if not exists wine_lots (
   id uuid primary key default gen_random_uuid(),
   lot_code text unique not null,
-  finished_product_id uuid not null references finished_products(id),
+  finished_product_id uuid references finished_products(id),
   lot_status_id uuid not null references cat_lot_status(id),
   current_stage_id uuid not null references cat_vinification_stages(id),
   start_date date not null,
@@ -185,6 +185,7 @@ create table if not exists wine_lots (
   actual_end_date date,
   target_volume_liters numeric(14,3) not null check (target_volume_liters > 0),
   current_volume_liters numeric(14,3) not null default 0 check (current_volume_liters >= 0),
+  operational_state text,
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -250,7 +251,7 @@ create table if not exists raw_material_stock_movements (
 
 create table if not exists finished_product_stock_movements (
   id uuid primary key default gen_random_uuid(),
-  finished_product_id uuid not null references finished_products(id),
+  finished_product_id uuid references finished_products(id),
   movement_type text not null check (movement_type in ('IN', 'OUT', 'ADJUSTMENT')),
   quantity integer not null check (quantity > 0),
   movement_date timestamptz not null default now(),
@@ -386,7 +387,7 @@ create table if not exists sales_orders (
 create table if not exists sales_order_items (
   id uuid primary key default gen_random_uuid(),
   sales_order_id uuid not null references sales_orders(id) on delete cascade,
-  finished_product_id uuid not null references finished_products(id),
+  finished_product_id uuid references finished_products(id),
   quantity integer not null check (quantity > 0),
   unit_price numeric(14,2) not null check (unit_price >= 0),
   line_total numeric(14,2) generated always as (quantity * unit_price) stored
@@ -397,7 +398,7 @@ create table if not exists sales_history (
   sale_date date not null,
   sales_order_id uuid references sales_orders(id) on delete set null,
   client_id uuid not null references clients(id),
-  finished_product_id uuid not null references finished_products(id),
+  finished_product_id uuid references finished_products(id),
   quantity integer not null check (quantity > 0),
   unit_price numeric(14,2) not null check (unit_price >= 0),
   total_amount numeric(14,2) generated always as (quantity * unit_price) stored,
