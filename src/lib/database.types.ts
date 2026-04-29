@@ -240,9 +240,47 @@ export type Database = {
         }
       >;
       wine_lots: TableDef<
-        { id: string; lot_code: string },
-        { id?: string; lot_code: string },
-        { id?: string; lot_code?: string }
+        {
+          id: string;
+          lot_code: string;
+          finished_product_id: string;
+          lot_status_id: string;
+          current_stage_id: string;
+          start_date: string;
+          estimated_end_date: string | null;
+          actual_end_date: string | null;
+          target_volume_liters: number;
+          current_volume_liters: number;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        },
+        {
+          id?: string;
+          lot_code: string;
+          finished_product_id: string;
+          lot_status_id: string;
+          current_stage_id: string;
+          start_date: string;
+          estimated_end_date?: string | null;
+          actual_end_date?: string | null;
+          target_volume_liters: number;
+          current_volume_liters?: number;
+          notes?: string | null;
+        },
+        {
+          id?: string;
+          lot_code?: string;
+          finished_product_id?: string;
+          lot_status_id?: string;
+          current_stage_id?: string;
+          start_date?: string;
+          estimated_end_date?: string | null;
+          actual_end_date?: string | null;
+          target_volume_liters?: number;
+          current_volume_liters?: number;
+          notes?: string | null;
+        }
       >;
       finished_products: TableDef<
         { id: string; sku: string; name: string; presentation: string | null; is_active: boolean },
