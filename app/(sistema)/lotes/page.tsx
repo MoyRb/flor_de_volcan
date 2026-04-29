@@ -2,8 +2,8 @@
 import Link from 'next/link';
 import { createClient } from '@/src/lib/supabase/server';
 
-function fruitFromNotes(notes: string | null) {
-  try { return notes ? (JSON.parse(notes) as { fruit_name?: string }).fruit_name : null; } catch { return null; }
+function lotMetaFromNotes(notes: string | null) {
+  try { return notes ? (JSON.parse(notes) as { fruit_name?: string; sistema_fermentacion?: string; estado_lote?: string }) : null; } catch { return null; }
 }
 
 export default async function LotesPage() {
@@ -23,11 +23,12 @@ export default async function LotesPage() {
   return (
     <section className="fdv-panel p-6">
       <div className="mb-4 flex items-center justify-between"><h1 className="font-brand text-2xl text-fdv-burgundy">Lotes</h1><Link href="/lotes/nuevo" className="fdv-btn-primary">Nuevo Lote</Link></div>
-      <table className="w-full text-sm"><thead><tr><th>Lote</th><th>Fruta</th><th>Etapa</th><th>Inicio</th><th>Última medición</th><th>Recipiente</th><th></th></tr></thead><tbody>
+      <table className="w-full text-sm"><thead><tr><th>Lote</th><th>Materia Prima Base</th><th>Estado del Lote</th><th>Inicio</th><th>Última medición</th><th>Sistema de Fermentación</th><th></th></tr></thead><tbody>
         {lotsList.map((lot) => {
           const readings = (lot.lot_daily_metrics ?? []);
           const last = readings.sort((a, b) => b.metric_date.localeCompare(a.metric_date))[0];
-          return <tr key={lot.id} className="border-t"><td>{lot.lot_code}</td><td>{fruitFromNotes(lot.notes) ?? '-'}</td><td>{(lot.cat_vinification_stages as { name?: string } | null)?.name ?? '-'}</td><td>{lot.start_date}</td><td>{last ? `${last.metric_date} (Brix ${last.brix ?? '-'})` : '-'}</td><td>{tankByLot.get(lot.id) ?? '-'}</td><td><Link href={`/reportes?lot=${lot.id}`} className="fdv-btn-secondary">Abrir detalle</Link></td></tr>;
+          const meta = lotMetaFromNotes(lot.notes);
+          return <tr key={lot.id} className="border-t"><td>{lot.lot_code}</td><td>{meta?.fruit_name ?? '-'}</td><td>{meta?.estado_lote ?? (lot.cat_vinification_stages as { name?: string } | null)?.name ?? '-'}</td><td>{lot.start_date}</td><td>{last ? `${last.metric_date} (Brix ${last.brix ?? '-'})` : '-'}</td><td>{meta?.sistema_fermentacion ?? tankByLot.get(lot.id) ?? '-'}</td><td><Link href={`/reportes?lot=${lot.id}`} className="fdv-btn-secondary">Abrir detalle</Link></td></tr>;
         })}
       </tbody></table>
     </section>

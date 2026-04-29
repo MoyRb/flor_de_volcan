@@ -9,7 +9,7 @@ function formatDate(value?: string) {
 
 function getLotMeta(notes: string | null) {
   if (!notes) return null;
-  try { return JSON.parse(notes) as { fruit_name?: string; yeast?: string; target_brix?: number; target_ph?: number }; } catch { return null; }
+  try { return JSON.parse(notes) as { fruit_name?: string; inoculo_utilizado?: string; target_brix?: number; target_ph?: number; protocolo_proceso?: string; relacion_materia_prima_gl?: number; condicion_esperada_transicion?: string; criterio_transicion?: string }; } catch { return null; }
 }
 
 export default async function DashboardPage() {
@@ -38,7 +38,8 @@ export default async function DashboardPage() {
     <header className="fdv-panel p-5">
       <h1 className="text-2xl font-semibold text-fdv-heading">Lote activo: {lot?.lot_code ?? 'Sin lote'}</h1>
       <p className="text-sm text-fdv-muted">Día {processDay} · {lot?.current_volume_liters ?? 0} L · Última medición {formatDate(latest?.metric_date)}</p>
-      <p className="text-sm text-fdv-muted">Fruta: {meta?.fruit_name ?? 'No definida'} · Levadura: {meta?.yeast ?? 'N/A'} · Objetivo Brix/pH: {meta?.target_brix ?? '-'} / {meta?.target_ph ?? '-'}</p>
+      <p className="text-sm text-fdv-muted">Materia Prima Base: {meta?.fruit_name ?? 'No definida'} · Inóculo utilizado: {meta?.inoculo_utilizado ?? 'N/A'} · Protocolo de proceso: {meta?.protocolo_proceso ?? 'N/A'}</p>
+      <p className="text-sm text-fdv-muted">Relación materia prima/volumen: {meta?.relacion_materia_prima_gl ?? '-'} g/L · Condición esperada de transición: {meta?.condicion_esperada_transicion ?? '-'} · Criterio de transición: {meta?.criterio_transicion ?? '-'}</p>
       <p className="text-sm text-fdv-muted">Estado: {(lot?.cat_lot_status as { name?: string } | null)?.name ?? 'N/A'} · Etapa: {(lot?.cat_vinification_stages as { name?: string } | null)?.name ?? 'N/A'}</p>
     </header>
 
