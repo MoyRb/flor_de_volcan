@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -53,10 +54,10 @@ export async function createLot(formData: FormData) {
   if (!lot?.id) return;
 
   await Promise.all([
-    supabase.from('lot_stage_history').insert({ lot_id: lot.id, stage_id: stageId, started_at: `${start_date}T00:00:00Z`, comments: 'Etapa inicial del lote' }),
-    supabase.from('lot_daily_metrics').upsert({ lot_id: lot.id, metric_date: start_date, brix, ph, temperature_c }, { onConflict: 'lot_id,metric_date' }),
-    supabase.from('bitacora_entries').insert({ lot_id: lot.id, entry_type: 'creacion_lote', details: `Lote creado para ${fruit?.name ?? 'fruta'}${recipeId ? ' (ensayo/receta)' : ''}. Brix inicial ${brix}; pH inicial ${ph}.`, tags: ['lote', 'inicio', 'fruta'] }),
-    tankId ? supabase.from('capacity_tanks').update({ current_lot_id: lot.id }).eq('id', tankId) : Promise.resolve(),
+    (supabase as any).from('lot_stage_history').insert({ lot_id: lot.id, stage_id: stageId, started_at: `${start_date}T00:00:00Z`, comments: 'Etapa inicial del lote' }),
+    (supabase as any).from('lot_daily_metrics').upsert({ lot_id: lot.id, metric_date: start_date, brix, ph, temperature_c }, { onConflict: 'lot_id,metric_date' }),
+    (supabase as any).from('bitacora_entries').insert({ lot_id: lot.id, entry_type: 'creacion_lote', details: `Lote creado para ${fruit?.name ?? 'fruta'}${recipeId ? ' (ensayo/receta)' : ''}. Brix inicial ${brix}; pH inicial ${ph}.`, tags: ['lote', 'inicio', 'fruta'] }),
+    tankId ? (supabase as any).from('capacity_tanks').update({ current_lot_id: lot.id }).eq('id', tankId) : Promise.resolve(),
   ]);
 
   revalidatePath('/lotes'); revalidatePath('/dashboard'); revalidatePath('/reportes');

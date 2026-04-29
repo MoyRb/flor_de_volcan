@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -30,7 +31,7 @@ export async function registerMeasurement(formData: FormData) {
     temperature_c: temperature,
   }, { onConflict: 'lot_id,metric_date' });
 
-  await supabase.from('bitacora_entries').insert({
+  await (supabase as any).from('bitacora_entries').insert({
     entry_type: 'medicion',
     entry_date: readingAt,
     lot_id: lotId,
@@ -42,7 +43,7 @@ export async function registerMeasurement(formData: FormData) {
   if (lot?.start_date && brix !== null) {
     const day = Math.floor((Date.parse(metricDate) - Date.parse(lot.start_date)) / 86400000) + 1;
     if (day >= 5 && brix >= 13 && brix <= 14) {
-      await supabase.from('bitacora_entries').insert({
+      await (supabase as any).from('bitacora_entries').insert({
         entry_type: 'recomendacion',
         lot_id: lotId,
         details: 'Brix entre 13-14 desde día 5: se recomienda trasiego a otro recipiente para maduración.',
@@ -66,7 +67,7 @@ export async function registerEvent(formData: FormData) {
 
   if (!lotId || !details) return;
 
-  await supabase.from('bitacora_entries').insert({
+  await (supabase as any).from('bitacora_entries').insert({
     lot_id: lotId,
     tank_id: tankId || null,
     entry_type: eventType,

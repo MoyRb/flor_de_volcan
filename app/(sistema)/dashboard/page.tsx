@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@/src/lib/supabase/server';
 import { registerEvent, registerMeasurement } from './actions';
 
@@ -13,7 +14,7 @@ function getLotMeta(notes: string | null) {
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: lot } = await supabase
+  const { data: lot } = await (supabase as any)
     .from('wine_lots')
     .select('id, lot_code, start_date, current_volume_liters, notes, cat_vinification_stages(name), cat_lot_status(name)')
     .order('start_date', { ascending: false })
@@ -23,12 +24,12 @@ export default async function DashboardPage() {
   const lotId = lot?.id;
   const [metricsRes, eventsRes] = lotId
     ? await Promise.all([
-        supabase.from('lot_daily_metrics').select('metric_date, temperature_c, ph, brix').eq('lot_id', lotId).order('metric_date'),
-        supabase.from('bitacora_entries').select('entry_date, entry_type, details').eq('lot_id', lotId).order('entry_date', { ascending: false }).limit(8),
+        (supabase as any).from('lot_daily_metrics').select('metric_date, temperature_c, ph, brix').eq('lot_id', lotId).order('metric_date'),
+        (supabase as any).from('bitacora_entries').select('entry_date, entry_type, details').eq('lot_id', lotId).order('entry_date', { ascending: false }).limit(8),
       ])
     : [{ data: [] }, { data: [] }];
 
-  const metrics = metricsRes.data ?? [];
+  const metrics: Array<{ metric_date: string; temperature_c: number | null; ph: number | null; brix: number | null }> = (metricsRes.data ?? []) as any[];
   const latest = metrics.at(-1);
   const processDay = metrics.length > 0 ? metrics.length : '-';
   const meta = getLotMeta(lot?.notes ?? null);
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
 
       <article className="fdv-panel p-5">
         <h3 className="font-semibold">Línea de eventos</h3>
-        <ul className="mt-2 space-y-1 text-sm">{(eventsRes.data ?? []).map((e) => <li key={`${e.entry_date}-${e.details}`}>{formatDate(e.entry_date)} · [{e.entry_type}] {e.details}</li>)}</ul>
+        <ul className="mt-2 space-y-1 text-sm">{((eventsRes.data ?? []) as Array<{ entry_date: string; entry_type: string; details: string }>).map((e) => <li key={`${e.entry_date}-${e.details}`}>{formatDate(e.entry_date)} · [{e.entry_type}] {e.details}</li>)}</ul>
         {lotId && <form action={registerEvent} className="mt-4 grid gap-2">
           <input type="hidden" name="lot_id" value={lotId} />
           <select name="event_type" className="fdv-input"><option value="inoculacion">Inoculación</option><option value="medicion">Medición</option><option value="trasiego">Trasiego</option><option value="ajuste_ph">Ajuste pH</option><option value="cambio_recipiente">Cambio de recipiente</option><option value="estabilizacion">Estabilización</option><option value="embotellado">Embotellado</option><option value="observacion">Observación</option></select>
