@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createClient } from "@/src/lib/supabase/server";
 
 function formatDate(value?: string) {
@@ -39,17 +40,18 @@ export default async function DashboardPage() {
   return (
     <section className="space-y-5">
       <header className="fdv-panel overflow-hidden">
-        <div className="relative border-b border-fdv-line px-6 py-5 text-center">
-          <div className="mb-2 flex items-center justify-center gap-4 text-fdv-muted">
-            <span className="h-px w-16 bg-fdv-line" />
-            <h1 className="font-brand text-5xl leading-none text-fdv-heading">Flor del Volcán</h1>
-            <span className="h-px w-16 bg-fdv-line" />
+        <div className="border-b border-fdv-line px-6 py-5 text-center">
+          <div className="mx-auto flex max-w-[420px] items-center justify-center rounded-2xl bg-white px-4 py-3">
+            <Image
+              src="/branding/logo-flor-del-volcan.png"
+              alt="Flor del Volcán"
+              width={420}
+              height={140}
+              priority
+              className="h-auto max-h-28 w-auto max-w-full object-contain"
+            />
           </div>
-          <p className="text-xs tracking-[0.32em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
-          <svg viewBox="0 0 500 120" className="pointer-events-none absolute inset-x-0 bottom-1 h-20 w-full text-[#c8beb4]/60" fill="none" stroke="currentColor" strokeWidth="1">
-            <path d="M18 100c45-10 87-20 120-40 45-27 56-49 80-48 27 2 33 29 53 38 26 11 57 12 83 2 50-21 90-20 128-9" />
-            <path d="M220 40l8-18m0 0l8 18m-8-18V8" />
-          </svg>
+          <p className="mt-2 text-xs tracking-[0.32em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 px-6 py-4">
           <div>
