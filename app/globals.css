@@ -48,13 +48,13 @@ body {
 .fdv-volcan-bg::after {
   content: "";
   position: absolute;
-  right: -6.5rem;
-  top: -2.2rem;
-  width: min(50vw, 540px);
-  height: min(35vw, 360px);
+  right: -7.8rem;
+  top: -1.4rem;
+  width: min(62vw, 675px);
+  height: min(44vw, 450px);
   background: url('/branding/flor-del-volcan-logo.svg') no-repeat center;
   background-size: contain;
-  opacity: 0.12;
+  opacity: 0.17;
   pointer-events: none;
   z-index: -1;
 }
