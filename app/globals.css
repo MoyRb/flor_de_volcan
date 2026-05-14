@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-fdv-cream: #f5f1ea;
+  --color-fdv-cream: #f4eee4;
   --color-fdv-sidebar: #f8f4ed;
-  --color-fdv-card: #fcf9f4;
-  --color-fdv-line: #e3d9ca;
+  --color-fdv-card: #fcf8f1;
+  --color-fdv-line: #dfd1bd;
   --color-fdv-ink: #4b433d;
-  --color-fdv-muted: #857a71;
-  --color-fdv-heading: #564b43;
-  --color-fdv-terracotta: #b26958;
+  --color-fdv-muted: #7f7368;
+  --color-fdv-heading: #4e433a;
+  --color-fdv-terracotta: #a45e4e;
   --color-fdv-green: #c9d7b8;
-  --color-fdv-active: #efe2d7;
+  --color-fdv-active: #ebdece;
 
   --font-sans: "Inter", "Segoe UI", sans-serif;
   --font-brand: "Playfair Display", "Times New Roman", serif;
 }
 
 body {
-  background: radial-gradient(circle at 0 0, #faf5ee 0, var(--color-fdv-cream) 40%);
+  background: radial-gradient(circle at 0 0, #faf3e8 0, var(--color-fdv-cream) 52%);
   color: var(--color-fdv-ink);
   font-family: var(--font-sans);
 }
@@ -25,7 +25,7 @@ body {
 .font-brand { font-family: var(--font-brand); }
 
 .fdv-sidebar {
-  background: linear-gradient(180deg, #fbf8f3, #f5efe7);
+  background: linear-gradient(180deg, #fbf7f1, #f3ece2);
   border-right: 1px solid var(--color-fdv-line);
   display: flex;
   flex-direction: column;
@@ -33,37 +33,42 @@ body {
 }
 
 .fdv-panel {
-  border-radius: 1.2rem;
+  border-radius: 1.35rem;
   border: 1px solid var(--color-fdv-line);
-  background: linear-gradient(180deg, #fefcf8, var(--color-fdv-card));
-  box-shadow: 0 12px 28px rgba(83, 68, 57, 0.06);
+  background: linear-gradient(180deg, #fffdf9, var(--color-fdv-card));
+  box-shadow: 0 16px 30px rgba(83, 68, 57, 0.07);
 }
 
 .fdv-volcan-bg {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .fdv-volcan-bg::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: url('/branding/flor-del-volcan-logo.svg') no-repeat right -8rem top 0.5rem;
-  background-size: min(55vw, 520px);
-  opacity: 0.07;
+  right: -8rem;
+  top: -1.5rem;
+  width: min(40vw, 420px);
+  height: min(28vw, 280px);
+  background: url('/branding/flor-del-volcan-logo.svg') no-repeat center;
+  background-size: contain;
+  opacity: 0.05;
   pointer-events: none;
+  z-index: -1;
 }
 
 .fdv-input {
   border: 1px solid var(--color-fdv-line);
-  border-radius: 0.75rem;
+  border-radius: 0.85rem;
   background: #fffdfa;
   padding: 0.55rem 0.7rem;
 }
 
 .fdv-btn-primary,
 .fdv-btn-secondary {
-  border-radius: 0.75rem;
+  border-radius: 0.85rem;
   padding: 0.55rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
