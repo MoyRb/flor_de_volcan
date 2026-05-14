@@ -17,13 +17,14 @@ export function Sidebar() {
           <Image
             src="/branding/flor-del-volcan-logo.svg"
             alt="Flor del Volcán"
-            width={280}
-            height={140}
+            width={240}
+            height={88}
             priority
-            className="h-auto w-full object-contain"
+            loading="eager"
+            className="mx-auto h-auto w-full max-w-[210px] object-contain"
           />
         </div>
-        <p className="mt-3 text-center text-xs tracking-[0.24em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
+        <p className="mt-3 text-center text-[11px] tracking-[0.24em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
       </div>
 
       <nav className="mt-2 space-y-1.5">
@@ -33,7 +34,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
+              className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 transition ${
                 active
                   ? "border-transparent bg-fdv-active text-fdv-heading shadow-sm"
                   : "border-transparent text-fdv-muted hover:border-fdv-line hover:bg-[#fffdfb]"

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Image from "next/image";
 import { createClient } from "@/src/lib/supabase/server";
 import { registerEvent, registerMeasurement } from "./actions";
 
@@ -36,33 +35,42 @@ export default async function DashboardPage() {
   const meta = getLotMeta(lot?.notes ?? null);
   const events = (eventsRes.data ?? []) as Array<{ entry_date: string; entry_type: string; details: string }>;
 
-  return <section className="space-y-4">
-    <header className="fdv-panel fdv-volcan-bg p-5">
-      <div className="mb-5 flex justify-center">
-        <Image src="/branding/flor-del-volcan-logo.svg" alt="Flor del Volcán" width={470} height={140} className="h-auto w-full max-w-[460px] opacity-90" />
+  return <section className="space-y-5">
+    <header className="fdv-panel fdv-volcan-bg px-6 py-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-fdv-muted">Panel operativo de fermentación</p>
+          <h1 className="mt-2 text-3xl font-semibold leading-tight text-fdv-heading">Lote activo · {lot?.lot_code ?? "Sin lote activo"}</h1>
+          <p className="mt-2 text-sm text-fdv-muted">Día {processDay} · {lot?.current_volume_liters ?? 0} L · Última medición {formatDateTime(latest?.metric_date)}</p>
+        </div>
+        <span className="rounded-full border border-fdv-line bg-[#f8efe2] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.16em] text-fdv-heading">Operación en curso</span>
       </div>
-      <h1 className="text-2xl font-semibold text-fdv-heading">Lote actual — {lot?.lot_code ?? "Sin lote activo"}</h1>
-      <p className="text-sm text-fdv-muted">Día {processDay} · {lot?.current_volume_liters ?? 0} L · Última medición {formatDateTime(latest?.metric_date)}</p>
-      <p className="text-sm text-fdv-muted">Materia Prima Base: {meta?.fruit_name ?? "No definida"} · Protocolo de proceso: {meta?.protocolo_proceso ?? "N/A"} · Sistema de Fermentación: {meta?.sistema_fermentacion ?? "N/A"}</p>
-      <p className="text-sm text-fdv-muted">Estado del Lote: {meta?.estado_lote ?? (lot?.cat_lot_status as { name?: string } | null)?.name ?? "N/A"} · Temperatura de inoculación: {meta?.temperatura_inoculacion_c ?? "-"} °C</p>
-      <p className="text-sm text-fdv-muted">Relación materia prima/volumen: {meta?.relacion_materia_prima_gl ?? "-"} g/L · Criterio de transición: {meta?.criterio_transicion ?? "-"}</p>
+
+      <div className="mt-5 grid gap-2 text-sm text-fdv-muted sm:grid-cols-2">
+        <p><span className="font-medium text-fdv-heading">Materia prima:</span> {meta?.fruit_name ?? "No definida"}</p>
+        <p><span className="font-medium text-fdv-heading">Protocolo:</span> {meta?.protocolo_proceso ?? "N/A"}</p>
+        <p><span className="font-medium text-fdv-heading">Sistema:</span> {meta?.sistema_fermentacion ?? "N/A"}</p>
+        <p><span className="font-medium text-fdv-heading">Estado:</span> {meta?.estado_lote ?? (lot?.cat_lot_status as { name?: string } | null)?.name ?? "N/A"}</p>
+        <p><span className="font-medium text-fdv-heading">Temp. inoculación:</span> {meta?.temperatura_inoculacion_c ?? "-"} °C</p>
+        <p><span className="font-medium text-fdv-heading">Relación MP/Vol:</span> {meta?.relacion_materia_prima_gl ?? "-"} g/L · {meta?.criterio_transicion ?? "-"}</p>
+      </div>
     </header>
 
     <article className="fdv-panel p-5">
-      <h2 className="text-lg font-semibold">Tendencia de Brix (datos guardados)</h2>
-      <svg viewBox="0 0 100 36" className="h-52 w-full rounded-xl border border-fdv-line bg-[#fffcfa]" preserveAspectRatio="none">
-        {metrics.length > 1 && <polyline fill="none" stroke="#b86e5a" strokeWidth="0.8" points={metrics.map((m, i) => `${(i / (metrics.length - 1)) * 100},${34 - Number(m.brix ?? 0)}`).join(" ")} />}
+      <h2 className="text-lg font-semibold text-fdv-heading">Tendencia de Brix (datos guardados)</h2>
+      <svg viewBox="0 0 100 36" className="mt-3 h-52 w-full rounded-2xl border border-fdv-line bg-[#fffcfa]" preserveAspectRatio="none">
+        {metrics.length > 1 && <polyline fill="none" stroke="#a8614f" strokeWidth="0.9" points={metrics.map((m, i) => `${(i / (metrics.length - 1)) * 100},${34 - Number(m.brix ?? 0)}`).join(" ")} />}
       </svg>
       <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
-        <div className="rounded-xl border border-fdv-line bg-[#fffcf9] p-3">Temp: {latest?.temperature_c ?? "-"} °C</div>
-        <div className="rounded-xl border border-fdv-line bg-[#fffcf9] p-3">pH: {latest?.ph ?? "-"}</div>
-        <div className="rounded-xl border border-fdv-line bg-[#fffcf9] p-3">Brix: {latest?.brix ?? "-"}</div>
+        <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">Temp: {latest?.temperature_c ?? "-"} °C</div>
+        <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">pH: {latest?.ph ?? "-"}</div>
+        <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">Brix: {latest?.brix ?? "-"}</div>
       </div>
     </article>
 
     <div className="grid gap-4 lg:grid-cols-2">
       <article className="fdv-panel p-5">
-        <h3 className="font-semibold">Últimas mediciones reales</h3>
+        <h3 className="font-semibold text-fdv-heading">Últimas mediciones reales</h3>
         <ul className="mt-2 space-y-1 text-sm">{metrics.slice(-6).reverse().map((m) => <li key={m.metric_date}>{formatDateTime(m.metric_date)} · Brix {m.brix ?? "-"} · pH {m.ph ?? "-"} · Temp {m.temperature_c ?? "-"}°C</li>)}</ul>
         {lotId && <form action={registerMeasurement} className="mt-4 grid gap-2">
           <input type="hidden" name="lot_id" value={lotId} />
@@ -74,7 +82,7 @@ export default async function DashboardPage() {
       </article>
 
       <article className="fdv-panel p-5">
-        <h3 className="font-semibold">Seguimiento del lote (orden cronológico)</h3>
+        <h3 className="font-semibold text-fdv-heading">Seguimiento del lote (orden cronológico)</h3>
         <ul className="mt-2 space-y-1 text-sm">{events.map((e) => <li key={`${e.entry_date}-${e.details}`}>{formatDateTime(e.entry_date)} · [{e.entry_type}] {e.details}</li>)}</ul>
         {lotId && <form action={registerEvent} className="mt-4 grid gap-2">
           <input type="hidden" name="lot_id" value={lotId} />
