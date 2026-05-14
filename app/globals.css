@@ -50,8 +50,8 @@ body {
   position: absolute;
   right: -7.8rem;
   top: -2.2rem;
-  width: min(62vw, 675px);
-  height: min(44vw, 450px);
+  width: min(72vw, 780px);
+  height: min(52vw, 540px);
   background: url('/branding/flor-del-volcan-logo.svg') no-repeat center;
   background-size: contain;
   opacity: 0.17;
