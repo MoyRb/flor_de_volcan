@@ -13,15 +13,15 @@ export function Sidebar() {
   return (
     <aside className="fdv-sidebar px-5 py-6">
       <div className="rounded-3xl border border-fdv-line bg-fdv-card p-4 shadow-sm">
-        <div className="rounded-2xl border border-fdv-line/70 bg-[#f6f0e7] p-3">
+        <div className="rounded-2xl border border-fdv-line/70 bg-[#f6f0e7] px-4 py-3.5">
           <Image
             src="/branding/flor-del-volcan-logo.svg"
             alt="Flor del Volcán"
-            width={240}
-            height={88}
+            width={320}
+            height={118}
             priority
             loading="eager"
-            className="mx-auto h-auto w-full max-w-[210px] object-contain"
+            className="mx-auto h-auto w-full max-w-[280px] object-contain"
           />
         </div>
         <p className="mt-3 text-center text-[11px] tracking-[0.24em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
