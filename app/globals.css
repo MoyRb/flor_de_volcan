@@ -1,33 +1,31 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-fdv-cream: #f7f4ef;
-  --color-fdv-sidebar: #fbf8f3;
-  --color-fdv-card: #fcfaf7;
-  --color-fdv-line: #e4ddd2;
+  --color-fdv-cream: #f5f1ea;
+  --color-fdv-sidebar: #f8f4ed;
+  --color-fdv-card: #fcf9f4;
+  --color-fdv-line: #e3d9ca;
   --color-fdv-ink: #4b433d;
   --color-fdv-muted: #857a71;
-  --color-fdv-heading: #5a514a;
-  --color-fdv-terracotta: #b86e5a;
+  --color-fdv-heading: #564b43;
+  --color-fdv-terracotta: #b26958;
   --color-fdv-green: #c9d7b8;
-  --color-fdv-active: #eadfd8;
+  --color-fdv-active: #efe2d7;
 
   --font-sans: "Inter", "Segoe UI", sans-serif;
   --font-brand: "Playfair Display", "Times New Roman", serif;
 }
 
 body {
-  background: var(--color-fdv-cream);
+  background: radial-gradient(circle at 0 0, #faf5ee 0, var(--color-fdv-cream) 40%);
   color: var(--color-fdv-ink);
   font-family: var(--font-sans);
 }
 
-.font-brand {
-  font-family: var(--font-brand);
-}
+.font-brand { font-family: var(--font-brand); }
 
 .fdv-sidebar {
-  background: var(--color-fdv-sidebar);
+  background: linear-gradient(180deg, #fbf8f3, #f5efe7);
   border-right: 1px solid var(--color-fdv-line);
   display: flex;
   flex-direction: column;
@@ -35,10 +33,32 @@ body {
 }
 
 .fdv-panel {
-  border-radius: 1rem;
+  border-radius: 1.2rem;
   border: 1px solid var(--color-fdv-line);
-  background: var(--color-fdv-card);
-  box-shadow: 0 8px 20px rgba(83, 68, 57, 0.04);
+  background: linear-gradient(180deg, #fefcf8, var(--color-fdv-card));
+  box-shadow: 0 12px 28px rgba(83, 68, 57, 0.06);
+}
+
+.fdv-volcan-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.fdv-volcan-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url('/branding/flor-del-volcan-logo.svg') no-repeat right -8rem top 0.5rem;
+  background-size: min(55vw, 520px);
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.fdv-input {
+  border: 1px solid var(--color-fdv-line);
+  border-radius: 0.75rem;
+  background: #fffdfa;
+  padding: 0.55rem 0.7rem;
 }
 
 .fdv-btn-primary,
@@ -66,16 +86,4 @@ body {
   border: 1px solid var(--color-fdv-line);
   color: var(--color-fdv-heading);
   background: #fffcf9;
-}
-
-.fdv-badge {
-  border-radius: 999px;
-  padding: 0.24rem 0.7rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.fdv-badge-ok {
-  background: color-mix(in oklab, var(--color-fdv-green) 80%, white);
-  color: #55624a;
 }
