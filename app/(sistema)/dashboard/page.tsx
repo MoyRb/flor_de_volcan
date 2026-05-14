@@ -38,18 +38,14 @@ export default async function DashboardPage() {
 
   return <section className="space-y-4">
     <header className="fdv-panel fdv-volcan-bg p-5">
-      <div className="relative z-10 mb-3 flex items-start justify-between gap-4">
-        <div>
-          <p className="font-brand text-2xl leading-none text-fdv-heading">Flor del Volcán</p>
-          <p className="mt-1 text-xs tracking-[0.22em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
-        </div>
-        <Image src="/branding/flor-del-volcan-logo.svg" alt="Flor del Volcán" width={220} height={74} className="h-auto w-full max-w-[180px] opacity-70" />
+      <div className="mb-5 flex justify-center">
+        <Image src="/branding/flor-del-volcan-logo.svg" alt="Flor del Volcán" width={470} height={140} className="h-auto w-full max-w-[460px] opacity-90" />
       </div>
-      <h1 className="relative z-10 text-2xl font-semibold text-fdv-heading">Lote actual — {lot?.lot_code ?? "Sin lote activo"}</h1>
-      <p className="relative z-10 text-sm text-fdv-muted">Día {processDay} · {lot?.current_volume_liters ?? 0} L · Última medición {formatDateTime(latest?.metric_date)}</p>
-      <p className="relative z-10 text-sm text-fdv-muted">Materia Prima Base: {meta?.fruit_name ?? "No definida"} · Protocolo de proceso: {meta?.protocolo_proceso ?? "N/A"} · Sistema de Fermentación: {meta?.sistema_fermentacion ?? "N/A"}</p>
-      <p className="relative z-10 text-sm text-fdv-muted">Estado del Lote: {meta?.estado_lote ?? (lot?.cat_lot_status as { name?: string } | null)?.name ?? "N/A"} · Temperatura de inoculación: {meta?.temperatura_inoculacion_c ?? "-"} °C</p>
-      <p className="relative z-10 text-sm text-fdv-muted">Relación materia prima/volumen: {meta?.relacion_materia_prima_gl ?? "-"} g/L · Criterio de transición: {meta?.criterio_transicion ?? "-"}</p>
+      <h1 className="text-2xl font-semibold text-fdv-heading">Lote actual — {lot?.lot_code ?? "Sin lote activo"}</h1>
+      <p className="text-sm text-fdv-muted">Día {processDay} · {lot?.current_volume_liters ?? 0} L · Última medición {formatDateTime(latest?.metric_date)}</p>
+      <p className="text-sm text-fdv-muted">Materia Prima Base: {meta?.fruit_name ?? "No definida"} · Protocolo de proceso: {meta?.protocolo_proceso ?? "N/A"} · Sistema de Fermentación: {meta?.sistema_fermentacion ?? "N/A"}</p>
+      <p className="text-sm text-fdv-muted">Estado del Lote: {meta?.estado_lote ?? (lot?.cat_lot_status as { name?: string } | null)?.name ?? "N/A"} · Temperatura de inoculación: {meta?.temperatura_inoculacion_c ?? "-"} °C</p>
+      <p className="text-sm text-fdv-muted">Relación materia prima/volumen: {meta?.relacion_materia_prima_gl ?? "-"} g/L · Criterio de transición: {meta?.criterio_transicion ?? "-"}</p>
     </header>
 
     <article className="fdv-panel p-5">
