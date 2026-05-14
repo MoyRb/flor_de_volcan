@@ -12,18 +12,18 @@ export function Sidebar() {
 
   return (
     <aside className="fdv-sidebar px-5 py-6">
-      <div className="rounded-2xl border border-fdv-line bg-fdv-card p-5">
-        <div className="mx-auto flex min-h-[96px] w-full items-center justify-center rounded-xl bg-white p-3">
+      <div className="rounded-3xl border border-fdv-line bg-fdv-card p-4 shadow-sm">
+        <div className="rounded-2xl border border-fdv-line/70 bg-[#f6f0e7] p-3">
           <Image
-            src="/branding/logo-flor-del-volcan.png"
+            src="/branding/flor-del-volcan-logo.svg"
             alt="Flor del Volcán"
-            width={260}
-            height={90}
+            width={280}
+            height={140}
             priority
-            className="h-auto max-h-20 w-auto max-w-full object-contain"
+            className="h-auto w-full object-contain"
           />
         </div>
-        <p className="mt-3 text-center text-xs tracking-[0.2em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
+        <p className="mt-3 text-center text-xs tracking-[0.24em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
       </div>
 
       <nav className="mt-2 space-y-1.5">
@@ -35,7 +35,7 @@ export function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
                 active
-                  ? "border-transparent bg-fdv-active text-fdv-heading"
+                  ? "border-transparent bg-fdv-active text-fdv-heading shadow-sm"
                   : "border-transparent text-fdv-muted hover:border-fdv-line hover:bg-[#fffdfb]"
               }`}
             >
@@ -49,7 +49,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto rounded-2xl border border-fdv-line bg-fdv-card p-3 text-xs text-fdv-muted">
+      <div className="mt-auto rounded-2xl border border-fdv-line bg-fdv-card p-3 text-xs text-fdv-muted shadow-sm">
         <p className="font-medium text-fdv-heading">● Conectado</p>
         <p className="mt-1">Miércoles, 29 de abril de 2026</p>
       </div>
