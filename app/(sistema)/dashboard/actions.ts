@@ -10,6 +10,13 @@ function toNumber(value: FormDataEntryValue | null) {
   return Number.isFinite(n) ? n : null;
 }
 
+function resolveSensoryValue(formData: FormData, presetKey: string, customKey: string) {
+  const custom = String(formData.get(customKey) ?? '').trim();
+  if (custom) return custom;
+  const preset = String(formData.get(presetKey) ?? '').trim();
+  return preset || null;
+}
+
 export async function registerMeasurement(formData: FormData) {
   const supabase = await createClient();
   const lotId = String(formData.get('lot_id') ?? '');
@@ -17,7 +24,10 @@ export async function registerMeasurement(formData: FormData) {
   const brix = toNumber(formData.get('brix'));
   const ph = toNumber(formData.get('ph'));
   const temperature = toNumber(formData.get('temperature_c'));
-  const note = String(formData.get('note') ?? '').trim();
+  const observations = String(formData.get('observations') ?? formData.get('note') ?? '').trim();
+  const color = resolveSensoryValue(formData, 'color', 'color_custom');
+  const aroma = resolveSensoryValue(formData, 'aroma', 'aroma_custom');
+  const sabor = resolveSensoryValue(formData, 'sabor', 'sabor_custom');
 
   if (!lotId || !readingAt) return;
   if (brix === null && ph === null && temperature === null) return;
@@ -30,13 +40,27 @@ export async function registerMeasurement(formData: FormData) {
     brix,
     ph,
     temperature_c: temperature,
+    observations: observations || null,
+    color,
+    aroma,
+    sabor,
   }, { onConflict: 'lot_id,metric_date' });
+
+  const eventDetails = [
+    `Brix ${brix ?? '-'}`,
+    `pH ${ph ?? '-'}`,
+    `Temp ${temperature ?? '-'}°C`,
+    color ? `Color ${color}` : null,
+    aroma ? `Aroma ${aroma}` : null,
+    sabor ? `Sabor ${sabor}` : null,
+    observations ? `Observaciones: ${observations}` : null,
+  ].filter(Boolean).join(' · ');
 
   await (supabase as any).from('bitacora_entries').insert({
     entry_type: 'medicion',
     entry_date: readingAt,
     lot_id: lotId,
-    details: note || `Medición registrada: Brix ${brix ?? '-'}, pH ${ph ?? '-'}, Temp ${temperature ?? '-'}°C`,
+    details: `Medición registrada: ${eventDetails}`,
     tags: ['medicion'],
   });
 
@@ -80,4 +104,5 @@ export async function registerEvent(formData: FormData) {
 
   revalidatePath('/dashboard');
   revalidatePath('/reportes');
+  revalidatePath('/mediciones');
 }

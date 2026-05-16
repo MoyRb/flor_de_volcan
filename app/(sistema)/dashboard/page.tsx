@@ -24,12 +24,12 @@ export default async function DashboardPage() {
   const lotId = lot?.id;
   const [metricsRes, eventsRes] = lotId
     ? await Promise.all([
-      (supabase as any).from("lot_daily_metrics").select("metric_date, temperature_c, ph, brix").eq("lot_id", lotId).order("metric_date"),
+      (supabase as any).from("lot_daily_metrics").select("metric_date, temperature_c, ph, brix, color, aroma, sabor").eq("lot_id", lotId).order("metric_date"),
       (supabase as any).from("bitacora_entries").select("entry_date, entry_type, details").eq("lot_id", lotId).order("entry_date", { ascending: true }).limit(24),
     ])
     : [{ data: [] }, { data: [] }];
 
-  const metrics: Array<{ metric_date: string; temperature_c: number | null; ph: number | null; brix: number | null }> = (metricsRes.data ?? []) as any[];
+  const metrics: Array<{ metric_date: string; temperature_c: number | null; ph: number | null; brix: number | null; color: string | null; aroma: string | null; sabor: string | null }> = (metricsRes.data ?? []) as any[];
   const latest = metrics.at(-1);
   const processDay = metrics.length > 0 ? metrics.length : "-";
   const meta = getLotMeta(lot?.notes ?? null);
@@ -61,22 +61,35 @@ export default async function DashboardPage() {
       <svg viewBox="0 0 100 36" className="mt-3 h-52 w-full rounded-2xl border border-fdv-line bg-[#fffcfa]" preserveAspectRatio="none">
         {metrics.length > 1 && <polyline fill="none" stroke="#a8614f" strokeWidth="0.9" points={metrics.map((m, i) => `${(i / (metrics.length - 1)) * 100},${34 - Number(m.brix ?? 0)}`).join(" ")} />}
       </svg>
-      <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3 lg:grid-cols-6">
         <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">Temp: {latest?.temperature_c ?? "-"} °C</div>
         <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">pH: {latest?.ph ?? "-"}</div>
         <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">Brix: {latest?.brix ?? "-"}</div>
+        <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">Color: {latest?.color ?? "-"}</div>
+        <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">Aroma: {latest?.aroma ?? "-"}</div>
+        <div className="rounded-2xl border border-fdv-line bg-[#fffcf9] p-3">Sabor: {latest?.sabor ?? "-"}</div>
       </div>
     </article>
 
     <div className="grid gap-4 lg:grid-cols-2">
       <article className="fdv-panel p-5">
         <h3 className="font-semibold text-fdv-heading">Últimas mediciones reales</h3>
-        <ul className="mt-2 space-y-1 text-sm">{metrics.slice(-6).reverse().map((m) => <li key={m.metric_date}>{formatDateTime(m.metric_date)} · Brix {m.brix ?? "-"} · pH {m.ph ?? "-"} · Temp {m.temperature_c ?? "-"}°C</li>)}</ul>
+        <ul className="mt-2 space-y-1 text-sm">{metrics.slice(-6).reverse().map((m) => <li key={m.metric_date}>{formatDateTime(m.metric_date)} · Brix {m.brix ?? "-"} · pH {m.ph ?? "-"} · Temp {m.temperature_c ?? "-"}°C · Color {m.color ?? "-"} · Aroma {m.aroma ?? "-"} · Sabor {m.sabor ?? "-"}</li>)}</ul>
         {lotId && <form action={registerMeasurement} className="mt-4 grid gap-2">
           <input type="hidden" name="lot_id" value={lotId} />
           <input type="datetime-local" name="reading_at" required className="fdv-input" />
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3"><input name="brix" type="number" step="0.01" placeholder="Brix" className="fdv-input" /><input name="ph" type="number" step="0.01" placeholder="pH" className="fdv-input" /><input name="temperature_c" type="number" step="0.1" placeholder="°C" className="fdv-input" /></div>
-          <input name="note" placeholder="Nota" className="fdv-input" />
+          <input name="observations" placeholder="Observaciones" className="fdv-input" />
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <select name="color" className="fdv-input"><option value="">Color (opcional)</option><option>Rojo oscuro</option><option>Rojo claro</option><option>Violeta</option><option>Rubí</option><option>Granate</option><option>Otro</option></select>
+            <select name="aroma" className="fdv-input"><option value="">Aroma (opcional)</option><option>Frutal</option><option>Floral</option><option>Fermentativo</option><option>Especiado</option><option>Alcoholico</option><option>Ácido</option><option>Otro</option></select>
+            <select name="sabor" className="fdv-input"><option value="">Sabor (opcional)</option><option>Dulce</option><option>Seco</option><option>Ácido</option><option>Amargo</option><option>Astringente</option><option>Equilibrado</option><option>Otro</option></select>
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <input name="color_custom" placeholder="Color libre" className="fdv-input" />
+            <input name="aroma_custom" placeholder="Aroma libre" className="fdv-input" />
+            <input name="sabor_custom" placeholder="Sabor libre" className="fdv-input" />
+          </div>
           <button className="fdv-btn-primary">Nueva medición</button>
         </form>}
       </article>
