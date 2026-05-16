@@ -230,6 +230,9 @@ create table if not exists lot_daily_metrics (
   alcohol_pct numeric(8,3),
   volume_liters numeric(14,3),
   observations text,
+  color text,
+  aroma text,
+  sabor text,
   unique (lot_id, metric_date)
 );
 

@@ -32,9 +32,9 @@ export type Database = {
         { id?: string; code?: string; name?: string; is_closed?: boolean }
       >;
       lot_daily_metrics: TableDef<
-        { id: string; lot_id: string; metric_date: string; temperature_c: number | null; ph: number | null; brix: number | null },
-        { id?: string; lot_id: string; metric_date: string; temperature_c?: number | null; ph?: number | null; brix?: number | null },
-        { id?: string; lot_id?: string; metric_date?: string; temperature_c?: number | null; ph?: number | null; brix?: number | null }
+        { id: string; lot_id: string; metric_date: string; temperature_c: number | null; ph: number | null; brix: number | null; observations: string | null; color: string | null; aroma: string | null; sabor: string | null },
+        { id?: string; lot_id: string; metric_date: string; temperature_c?: number | null; ph?: number | null; brix?: number | null; observations?: string | null; color?: string | null; aroma?: string | null; sabor?: string | null },
+        { id?: string; lot_id?: string; metric_date?: string; temperature_c?: number | null; ph?: number | null; brix?: number | null; observations?: string | null; color?: string | null; aroma?: string | null; sabor?: string | null }
       >;
       lot_stage_history: TableDef<
         { id: string; lot_id: string; started_at: string; comments: string | null },

@@ -9,7 +9,7 @@ export default async function ReportesPage({ searchParams }: { searchParams: Pro
   const selectedLot = params.lot ?? lotsList[0]?.id;
   const currentLot = lotsList.find((lot) => lot.id === selectedLot);
 
-  const metricsQ = (supabase as any).from('lot_daily_metrics').select('metric_date, brix, ph, temperature_c').eq('lot_id', selectedLot ?? '').order('metric_date', { ascending: false });
+  const metricsQ = (supabase as any).from('lot_daily_metrics').select('metric_date, brix, ph, temperature_c, color, aroma, sabor').eq('lot_id', selectedLot ?? '').order('metric_date', { ascending: false });
   const eventsQ = (supabase as any).from('bitacora_entries').select('entry_date, entry_type, details').eq('lot_id', selectedLot ?? '').order('entry_date', { ascending: false });
 
   if (params.from) {
@@ -22,7 +22,7 @@ export default async function ReportesPage({ searchParams }: { searchParams: Pro
   }
 
   const [{ data: metrics }, { data: events }] = await Promise.all([metricsQ, eventsQ]);
-  const metricsList = (metrics ?? []) as Array<{ metric_date: string; brix: number | null; ph: number | null; temperature_c: number | null }>;
+  const metricsList = (metrics ?? []) as Array<{ metric_date: string; brix: number | null; ph: number | null; temperature_c: number | null; color: string | null; aroma: string | null; sabor: string | null }>;
   const eventsList = (events ?? []) as Array<{ entry_date: string; entry_type: string; details: string }>;
 
   return <section className="space-y-4">
@@ -36,7 +36,7 @@ export default async function ReportesPage({ searchParams }: { searchParams: Pro
     <article className="fdv-panel p-4">
       <p className="text-sm text-fdv-burgundy">Estado del lote: {currentLot?.operational_state ?? currentLot?.cat_vinification_stages?.name ?? '-'}</p>
       <h2 className="font-semibold">Historial de mediciones reales</h2>
-      <ul className="text-sm">{metricsList.map((m) => <li key={m.metric_date}>{m.metric_date}: Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C</li>)}</ul>
+      <ul className="text-sm">{metricsList.map((m) => <li key={m.metric_date}>{m.metric_date}: Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C · Color {m.color ?? '-'} · Aroma {m.aroma ?? '-'} · Sabor {m.sabor ?? '-'}</li>)}</ul>
       <h2 className="mt-4 font-semibold">Seguimiento del lote (orden cronológico)</h2>
       <ul className="text-sm">{eventsList.map((e) => <li key={`${e.entry_date}-${e.details}`}>{new Date(e.entry_date).toLocaleString('es-MX')} [{e.entry_type}] {e.details}</li>)}</ul>
     </article>

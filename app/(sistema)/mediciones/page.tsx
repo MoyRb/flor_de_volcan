@@ -27,7 +27,7 @@ export default async function RegistroMedicionesPage({ searchParams }: { searchP
     ? await Promise.all([
         (supabase as any)
           .from('lot_daily_metrics')
-          .select('metric_date, brix, ph, temperature_c')
+          .select('metric_date, brix, ph, temperature_c, color, aroma, sabor')
           .eq('lot_id', selectedLot)
           .order('metric_date', { ascending: true })
           .limit(12),
@@ -40,7 +40,7 @@ export default async function RegistroMedicionesPage({ searchParams }: { searchP
       ])
     : [{ data: [] }, { data: [] }];
 
-  const metricas = (metricsRes.data ?? []) as Array<{ metric_date: string; brix: number | null; ph: number | null; temperature_c: number | null }>;
+  const metricas = (metricsRes.data ?? []) as Array<{ metric_date: string; brix: number | null; ph: number | null; temperature_c: number | null; color: string | null; aroma: string | null; sabor: string | null }>;
   const eventos = (eventsRes.data ?? []) as Array<{ entry_date: string; entry_type: string; details: string }>;
 
   return <section className="space-y-4">
@@ -68,7 +68,7 @@ export default async function RegistroMedicionesPage({ searchParams }: { searchP
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium">Observaciones</label>
-            <input name="note" placeholder="Opcional" className="fdv-input" />
+            <input name="observations" placeholder="Opcional" className="fdv-input" />
           </div>
         </div>
 
@@ -76,6 +76,25 @@ export default async function RegistroMedicionesPage({ searchParams }: { searchP
           <div><label className="mb-1 block text-sm font-medium">Brix</label><input name="brix" type="number" step="0.01" className="fdv-input" /></div>
           <div><label className="mb-1 block text-sm font-medium">pH</label><input name="ph" type="number" step="0.01" className="fdv-input" /></div>
           <div><label className="mb-1 block text-sm font-medium">Temp (°C)</label><input name="temperature_c" type="number" step="0.1" className="fdv-input" /></div>
+        </div>
+
+
+        <div className="grid gap-3 md:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Color</label>
+            <select name="color" className="fdv-input"><option value="">Selecciona color</option><option>Rojo oscuro</option><option>Rojo claro</option><option>Violeta</option><option>Rubí</option><option>Granate</option><option>Otro</option></select>
+            <input name="color_custom" placeholder="Color libre (opcional)" className="fdv-input mt-2" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Aroma</label>
+            <select name="aroma" className="fdv-input"><option value="">Selecciona aroma</option><option>Frutal</option><option>Floral</option><option>Fermentativo</option><option>Especiado</option><option>Alcoholico</option><option>Ácido</option><option>Otro</option></select>
+            <input name="aroma_custom" placeholder="Aroma libre (opcional)" className="fdv-input mt-2" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Sabor</label>
+            <select name="sabor" className="fdv-input"><option value="">Selecciona sabor</option><option>Dulce</option><option>Seco</option><option>Ácido</option><option>Amargo</option><option>Astringente</option><option>Equilibrado</option><option>Otro</option></select>
+            <input name="sabor_custom" placeholder="Sabor libre (opcional)" className="fdv-input mt-2" />
+          </div>
         </div>
 
         <div className="flex gap-2">
@@ -89,7 +108,7 @@ export default async function RegistroMedicionesPage({ searchParams }: { searchP
       <article className="fdv-panel p-5">
         <h2 className="font-semibold">Últimas mediciones reales</h2>
         <ul className="mt-2 space-y-1 text-sm">
-          {metricas.slice(-12).reverse().map((m) => <li key={m.metric_date}>{new Date(m.metric_date).toLocaleDateString('es-MX')}: Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C</li>)}
+          {metricas.slice(-12).reverse().map((m) => <li key={m.metric_date}>{new Date(m.metric_date).toLocaleDateString('es-MX')}: Brix {m.brix ?? '-'} · pH {m.ph ?? '-'} · Temp {m.temperature_c ?? '-'}°C · Color {m.color ?? '-'} · Aroma {m.aroma ?? '-'} · Sabor {m.sabor ?? '-'}</li>)}
           {metricas.length === 0 && <li className="text-fdv-muted">Sin mediciones registradas.</li>}
         </ul>
       </article>
