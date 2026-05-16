@@ -13,16 +13,17 @@ export function Sidebar() {
   return (
     <aside className="fdv-sidebar px-5 py-6">
       <div className="rounded-3xl border border-fdv-line bg-fdv-card p-4 shadow-sm">
-        <div className="rounded-2xl border border-fdv-line/70 bg-[#f6f0e7] px-4 py-3.5">
-          <Image
-            src="/branding/flor-del-volcan-logo.svg"
-            alt="Flor del Volcán"
-            width={320}
-            height={118}
-            priority
-            loading="eager"
-            className="mx-auto h-auto w-full max-w-[280px] object-contain"
-          />
+        <div className="rounded-2xl border border-fdv-line/70 bg-[#f6f0e7] px-2 py-2">
+          <div className="flex h-[150px] items-center justify-center overflow-hidden rounded-xl">
+            <Image
+              src="/branding/flor-del-volcan-logo.svg"
+              alt="Flor del Volcán"
+              width={420}
+              height={180}
+              priority
+              className="h-auto w-[260px] max-w-none scale-[1.75] object-contain opacity-95"
+            />
+          </div>
         </div>
         <p className="mt-3 text-center text-[11px] tracking-[0.24em] text-fdv-muted">CONTROL DE FERMENTACIÓN</p>
       </div>
